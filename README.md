@@ -6,10 +6,11 @@ A single-page blog application demonstrating **Stored Cross-Site Scripting (XSS)
 
 ##  Quick Start
 
-1. **Open `index.html`** directly in your browser (no server required for the client-side demo)
-2. The page loads in **Vulnerable Mode** by default (`innerHTML` rendering)
-3. Use the **Attack Panel** on the right to select XSS payloads
-4. Submit a comment and click **"Simulate Page View"** to trigger the stored XSS
+How to Use
+
+1.Open index.html in any browser (or run npx http-server . -p 8090)
+2.Click a payload in the Attack Panel → Submit → "Simulate Page View" → alert fires
+3.Toggle to Secure Mode → same payload renders as harmless text
 
 > **Optional:** To use the PHP backend, run `php -S localhost:8080` from the `xss-lab/` directory.
 
