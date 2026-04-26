@@ -4,7 +4,7 @@ A single-page blog application demonstrating **Stored Cross-Site Scripting (XSS)
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 1. **Open `index.html`** directly in your browser (no server required for the client-side demo)
 2. The page loads in **Vulnerable Mode** by default (`innerHTML` rendering)
@@ -28,12 +28,12 @@ xss-lab/
 │   └── ui.js               # Modal, tabs, payload injection
 ├── server/
 │   ├── config.php          # Database configuration
-│   ├── db.php              # ❌ Vulnerable PHP backend (educational)
+│   ├── db.php              # Vulnerable PHP backend (educational)
 │   └── db.sqlite           # SQLite database file
 ├── secure/
 │   ├── index.html          # Secure-only demo page
 │   └── server/
-│       └── db_secure.php   # ✅ Secure PHP backend with htmlspecialchars()
+│       └── db_secure.php   # Secure PHP backend with htmlspecialchars()
 ├── docs/
 │   ├── report.md           # Lab report template
 │   └── screenshots/        # Screenshots for submission
@@ -43,7 +43,7 @@ xss-lab/
 
 ---
 
-## 🎯 Features
+##  Features
 
 - **Vulnerable Mode:** Comments rendered via `innerHTML` — XSS payloads execute
 - **Secure Mode:** Comments rendered via `textContent` — payloads display as plain text
@@ -55,10 +55,10 @@ xss-lab/
 
 ---
 
-## 🔬 How to Demonstrate the Attack
+##  How to Demonstrate the Attack
 
 ### Step 1 — Inject Payload
-1. Click **"⚡ 2. Image onerror"** in the Attack Panel (most reliable via innerHTML)
+1. Click **" 2. Image onerror"** in the Attack Panel (most reliable via innerHTML)
 2. Enter any name in the author field
 3. Click **"Submit Comment"**
 
@@ -73,7 +73,7 @@ xss-lab/
 
 ---
 
-## 🛡️ Defense Mechanisms Covered
+##  Defense Mechanisms Covered
 
 | Defense | Implementation |
 |---------|---------------|
@@ -85,7 +85,7 @@ xss-lab/
 
 ---
 
-## ⚠️ Disclaimer
+##  Disclaimer
 
 This project is for **educational purposes only**. The vulnerabilities are intentional to demonstrate XSS concepts. Do not use these techniques on systems you do not own or have explicit permission to test.
 
