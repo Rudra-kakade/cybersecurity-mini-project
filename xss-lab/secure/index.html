@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SecBlog — Secure version demonstrating XSS prevention with textContent and htmlspecialchars.">
+  <title>SecBlog — Secure Mode Demo</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="site-logo">SecBlog <span>— Secure Demo</span></div>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <div class="vuln-badge safe">✅ textContent — SAFE</div>
+      <a href="../index.html" class="btn btn-secondary btn-sm" style="text-decoration:none;">← Back to Vulnerable Lab</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Main Column -->
+    <div class="main-col">
+
+      <article class="card">
+        <h1 class="blog-title">🛡️ Secure Rendering Demo</h1>
+        <div class="blog-body">
+          <p>This page <strong>always</strong> uses <code>textContent</code> to render comments. No matter what payload you submit, it will be displayed as <em>literal text</em> — never executed as code.</p>
+          <p>Try pasting any XSS payload below and observe how it renders harmlessly.</p>
+        </div>
+      </article>
+
+      <!-- Comment Section — ALWAYS SECURE -->
+      <div class="card">
+        <div class="comment-header">
+          <h3>💬 Comments (Secure)</h3>
+          <div class="vuln-badge safe">✅ textContent — SAFE</div>
+        </div>
+
+        <div id="secure-comment-list" class="comment-list">
+          <div class="comment-empty">No comments yet. Submit a payload to see it rendered as text.</div>
+        </div>
+
+        <div class="comment-form">
+          <input type="text" id="secure-author" placeholder="Your name">
+          <textarea id="secure-body" placeholder="Paste an XSS payload here..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="submitSecure()">Submit Comment</button>
+            <button class="btn btn-secondary btn-sm" onclick="clearSecure()">Clear All</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side-by-side Comparison -->
+      <div class="card">
+        <div class="section-title"><span class="icon">🔧</span> Why This Is Safe</div>
+        <div class="code-compare">
+          <div class="code-block">
+            <div class="code-block-header vuln-header">❌ Vulnerable (innerHTML)</div>
+            <pre><span class="hl-bad">bodyDiv.innerHTML = comment.body;</span>
+<span style="color:var(--text-muted)">// Parses HTML → &lt;script&gt; tags execute</span>
+<span style="color:var(--text-muted)">// Event handlers (onerror, onload) fire</span></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header safe-header">✅ Secure (textContent)</div>
+            <pre><span class="hl-good">bodyDiv.textContent = comment.body;</span>
+<span style="color:var(--text-muted)">// ALL input treated as plain text</span>
+<span style="color:var(--text-muted)">// &lt;script&gt; renders as visible text, never runs</span></pre>
+          </div>
+        </div>
+
+        <div class="code-compare" style="margin-top:1rem;">
+          <div class="code-block">
+            <div class="code-block-header vuln-header">❌ Vulnerable PHP</div>
+            <pre><span class="hl-bad">echo "&lt;div&gt;" . $_POST['comment'] . "&lt;/div&gt;";</span>
+<span style="color:var(--text-muted)">// Raw output — XSS executes</span></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header safe-header">✅ Secure PHP</div>
+            <pre><span class="hl-good">echo "&lt;div&gt;" . htmlspecialchars($comment, ENT_QUOTES, 'UTF-8') . "&lt;/div&gt;";</span>
+<span style="color:var(--text-muted)">// HTML entities — safe text output</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="side-col">
+      <div class="card">
+        <div class="section-title"><span class="icon">🧪</span> Test Payloads</div>
+        <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.75rem;">Click any payload to load it. It will render as harmless text.</p>
+        <div class="payload-list" id="secure-payload-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Payloads for testing
+    const testPayloads = [
+      { name: 'Script Alert', code: "<script>alert('XSS!')<\/script>" },
+      { name: 'Img onerror', code: '<img src=x onerror="alert(\'XSS\')">' },
+      { name: 'SVG onload', code: '<svg onload="alert(document.domain)">' },
+      { name: 'Cookie Theft', code: "<script>alert(document.cookie)<\/script>" }
+    ];
+
+    let secureComments = [];
+
+    // Build payload cards
+    const pList = document.getElementById('secure-payload-list');
+    testPayloads.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'payload-card';
+      card.onclick = () => {
+        document.getElementById('secure-body').value = p.code;
+        document.getElementById('secure-body').focus();
+      };
+      const codeDiv = document.createElement('div');
+      codeDiv.className = 'payload-code';
+      codeDiv.textContent = p.code;
+      card.innerHTML = '<div class="payload-name">⚡ ' + p.name + '</div>';
+      card.appendChild(codeDiv);
+      pList.appendChild(card);
+    });
+
+    // Submit comment — ALWAYS SECURE
+    function submitSecure() {
+      const author = document.getElementById('secure-author').value.trim() || 'Anonymous';
+      const body = document.getElementById('secure-body').value.trim();
+      if (!body) return;
+
+      secureComments.push({ author, body, ts: new Date().toLocaleTimeString() });
+      document.getElementById('secure-body').value = '';
+      renderSecure();
+    }
+
+    // Render — ALWAYS uses textContent
+    function renderSecure() {
+      const list = document.getElementById('secure-comment-list');
+      list.innerHTML = '';
+
+      if (secureComments.length === 0) {
+        list.innerHTML = '<div class="comment-empty">No comments yet.</div>';
+        return;
+      }
+
+      secureComments.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'comment-item safe-render';
+        const authorDiv = document.createElement('div');
+        authorDiv.className = 'comment-author';
+        authorDiv.textContent = c.author + ' · ' + c.ts;
+        const bodyDiv = document.createElement('div');
+        bodyDiv.className = 'comment-body';
+        bodyDiv.textContent = c.body; // ✅ ALWAYS textContent — safe!
+        item.appendChild(authorDiv);
+        item.appendChild(bodyDiv);
+        list.appendChild(item);
+      });
+    }
+
+    function clearSecure() {
+      secureComments = [];
+      renderSecure();
+    }
+  </script>
+</body>
+</html>
